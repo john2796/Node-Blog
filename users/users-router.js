@@ -89,5 +89,22 @@ server.put("/:id", (req, res) => {
       res.status(500).json({ message: "Cannot update" });
     });
 });
+// @route    GET api/posts
+// @desc     getUserPosts Messages
+// @Access   Public
+server.get("/:id/messages", (req, res) => {
+  db.getUserPosts(req.params.id)
+    .then(post => {
+      if (post.length) {
+        console.log(post);
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({ message: "Post not found" });
+      }
+    })
+    .catch(err => {
+      db.status(500).json({ message: "Error getting posts for the user" });
+    });
+});
 
 module.exports = server;
