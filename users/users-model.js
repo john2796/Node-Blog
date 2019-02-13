@@ -30,7 +30,7 @@ function insert(user) {
   return db("users")
     .insert(user)
     .then(ids => {
-      return getById(ids[0]);
+      return findById(ids[0]);
     });
 }
 

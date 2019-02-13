@@ -6,7 +6,7 @@ const db = require("./post-model");
 //Validation
 const validatePosts = require("../Validation/posts-validation");
 //global helper
-const getAllItem = (req, res) => {
+const getAllItems = (req, res) => {
   db.find()
     .then(posts => {
       res.status(200).json(posts);
@@ -20,24 +20,28 @@ const getAllItem = (req, res) => {
 // @desc     Fetch All Posts
 // @Access   Public
 server.get("/", (req, res) => {
-  getAllItem(req, res);
+  getAllItems(req, res);
 });
 // @route    POST api/posts
 // @desc     Create Single Post
 // @Access   Public
 server.post("/", (req, res) => {
-  const { errors, isValid } = validatePosts(req.body);
-  if (!isValid) {
-    return res.status(400).json(errors);
+  const { text } = req.body;
+  let user_id = Math.floor(Math.random() * 1000);
+  if (!text) {
+    res.status(400).json({ message: "Please provide title  for the post." });
   }
   db.insert(req.body)
-    .then(posts => {
-      getAllItem(req, res);
+    .then(post => {
+      console.log(post);
+      getAllItems(req, res);
+      // res.status(201).json(post);
     })
-    .catch(err =>
-      res.status(500).json({ message: "Error retrieving the posts" })
-    );
+    .catch(err => {
+      res.status(500).json({
+        message: "There was an error while saving the post to the database"
+      });
+    });
 });
 
 module.exports = server;
-2;

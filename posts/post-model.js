@@ -20,7 +20,7 @@ function insert(post) {
   return db("posts")
     .insert(post)
     .then(ids => {
-      return getById(ids[0]);
+      return findById(ids[0]);
     });
 }
 function update(id, changes) {
@@ -28,7 +28,6 @@ function update(id, changes) {
     .where({ id })
     .update(changes);
 }
-
 function remove(id) {
   return db("posts")
     .where("id", id)
