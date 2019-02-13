@@ -1,39 +1,36 @@
-const db = require('../dbConfig.js');
+const db = require("../data/dbConfig");
 
 module.exports = {
-  get,
-  getById,
+  find,
+  findById,
   insert,
   update,
-  remove,
+  remove
 };
 
-function get() {
-  return db('posts');
+function find() {
+  return db("posts");
 }
-
-function getById(id) {
-  return db('posts')
+function findById(id) {
+  return db("posts")
     .where({ id })
     .first();
 }
-
 function insert(post) {
-  return db('posts')
+  return db("posts")
     .insert(post)
     .then(ids => {
       return getById(ids[0]);
     });
 }
-
 function update(id, changes) {
-  return db('posts')
+  return db("posts")
     .where({ id })
     .update(changes);
 }
 
 function remove(id) {
-  return db('posts')
-    .where('id', id)
+  return db("posts")
+    .where("id", id)
     .del();
 }
