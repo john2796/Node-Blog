@@ -2,26 +2,39 @@ const express = require("express");
 const server = express.Router();
 
 //import model
-const db = require("./users-model");
+const Users = require("./users-model");
 //import validation
 const validateUserPost = require("../Validation/users-validation");
-// @route    GET api/users
-// @desc     Fetch All Users
-// @Access   Public
-server.get("/", (req, res) => {
-  db.find()
+const getAllUser = (req, res) => {
+  Users.find()
     .then(users => {
       res.status(200).json(users);
     })
     .catch(err => {
       res.status(500).json({ message: "Cannot retrieve User" });
     });
+};
+
+const upCaseMiddleWare = (req, res, next) => {
+  if (!req.body.name) {
+    res.status(400).json({ message: "name required" });
+  } else {
+    req.body.name = req.body.name.toUpperCase();
+    next();
+  }
+};
+
+// @route    GET api/users
+// @desc     Fetch All Users
+// @Access   Public
+server.get("/", (req, res) => {
+  getAllUser(req, res);
 });
 // @route    GET api/users/:id
 // @desc     Get single User
 // @Access   Public
 server.get("/:id", (req, res) => {
-  db.findById(req.params.id)
+  Users.findById(req.params.id)
     .then(user => {
       if (user) {
         res.status(200).json(user);
@@ -36,30 +49,36 @@ server.get("/:id", (req, res) => {
 // @route    POST api/users
 // @desc     Post user
 // @Access   Public
-server.post("/", (req, res) => {
+server.post("/", upCaseMiddleWare, (req, res) => {
   const { errors, isValid } = validateUserPost(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  db.insert(req.body)
+  Users.insert(req.body)
     .then(post => {
-      res.status(201).json(post);
+      getAllUser(req, res);
     })
     .catch(err => {
-      res.status(500).json({ message: "Cannot create post" });
+      res
+        .status(500)
+        .json({
+          message: "Failed to Create a User make sure it's not duplicated"
+        });
     });
 });
 // @route    DELETE api/users/:id
 // @desc     Delete user
 // @Access   Public
 server.delete("/:id", (req, res) => {
-  db.remove(req.params.id)
-    .then(user => {
-      if (user) {
-        res.status(200).json({ message: "successfully deleted" });
-      } else {
-        res.status(404).json({ message: "User Not Found" });
-      }
+  Users.removePosts(req.params.id)
+    .then(post => {
+      Users.remove(req.params.id).then(user => {
+        if (user) {
+          getAllUser(req, res);
+        } else {
+          res.status(404).json({ message: "User not found" });
+        }
+      });
     })
     .catch(err => {
       res.status(500).json({ message: "Error Removing the User" });
@@ -68,16 +87,16 @@ server.delete("/:id", (req, res) => {
 // @route    Update api/user
 // @desc     update user
 // @Access   Public
-server.put("/:id", (req, res) => {
+server.put("/:id", upCaseMiddleWare, (req, res) => {
   const { errors, isValid } = validateUserPost(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
 
-  db.update(req.params.id, req.body)
+  Users.update(req.params.id, req.body)
     .then(user => {
       if (user) {
-        db.findById(req.params.id).then(user => {
+        Users.findById(req.params.id).then(user => {
           res.status(200).json(user);
         });
         // res.status(200).json({ message: "succesfully updated user", user });
@@ -89,21 +108,20 @@ server.put("/:id", (req, res) => {
       res.status(500).json({ message: "Cannot update" });
     });
 });
-// @route    GET api/posts
+// @route    GET api/posts/:id/messages
 // @desc     getUserPosts Messages
 // @Access   Public
 server.get("/:id/messages", (req, res) => {
-  db.getUserPosts(req.params.id)
+  Users.getUserPosts(req.params.id)
     .then(post => {
       if (post.length) {
-        console.log(post);
         res.status(200).json(post);
       } else {
         res.status(404).json({ message: "Post not found" });
       }
     })
     .catch(err => {
-      db.status(500).json({ message: "Error getting posts for the user" });
+      Users.status(500).json({ message: "Error getting posts for the user" });
     });
 });
 

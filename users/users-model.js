@@ -6,19 +6,19 @@ module.exports = {
   getUserPosts,
   insert,
   update,
-  remove
+  remove,
+  removePosts
 };
 
-function find() {
+function find(query) {
   return db("users");
 }
-
 function findById(id) {
   return db("users")
     .where({ id })
     .first();
 }
-
+//getting user posts seperate table
 function getUserPosts(userId) {
   return db("posts as p")
     .join("users as u", "u.id", "p.user_id")
@@ -43,5 +43,10 @@ function update(id, changes) {
 function remove(id) {
   return db("users")
     .where("id", id)
+    .del();
+}
+function removePosts(id) {
+  return db("posts")
+    .where("user_id", id)
     .del();
 }

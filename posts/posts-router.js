@@ -2,12 +2,13 @@ const express = require("express");
 const server = express.Router();
 
 // model
-const db = require("./post-model");
+const Posts = require("./post-model");
+const Users = require("../users/users-model");
 //Validation
 const validatePosts = require("../Validation/posts-validation");
 //global helper
 const getAllItems = (req, res) => {
-  db.find()
+  Posts.findAll()
     .then(posts => {
       res.status(200).json(posts);
     })
@@ -15,6 +16,19 @@ const getAllItems = (req, res) => {
       res.status(500).json({ message: "Error retrieving the posts" });
     });
 };
+
+// @route    GET api/posts/query
+// @desc     Fetch All query ?
+// @Access   Public
+server.get("/query", (req, res) => {
+  Posts.find(req.query)
+    .then(posts => {
+      res.status(200).json(posts);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error retrieving the posts" });
+    });
+});
 
 // @route    GET api/posts
 // @desc     Fetch All Posts
@@ -25,22 +39,80 @@ server.get("/", (req, res) => {
 // @route    POST api/posts
 // @desc     Create Single Post
 // @Access   Public
-server.post("/", (req, res) => {
+server.post("/:id", (req, res) => {
   const { text } = req.body;
-  let user_id = Math.floor(Math.random() * 1000);
-  if (!text) {
-    res.status(400).json({ message: "Please provide title  for the post." });
+  const { errors, isValid } = validatePosts(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
-  db.insert(req.body)
-    .then(post => {
-      console.log(post);
-      getAllItems(req, res);
-      // res.status(201).json(post);
+  Users.findById(req.params.id)
+    .then(user => {
+      if (user) {
+        Posts.insert({ text, user_id: req.params.id }).then(post =>
+          getAllItems(req, res)
+        );
+      } else {
+        res.status(404).json({ message: "User Not Found" });
+      }
     })
     .catch(err => {
-      res.status(500).json({
-        message: "There was an error while saving the post to the database"
-      });
+      res.status(500).json({ message: "Error posting " });
+    });
+});
+
+// @route    GET api/posts
+// @desc     Fetch Single Post by their id
+// @Access   Public
+server.get("/:id", (req, res) => {
+  Posts.findById(req.params.id)
+    .then(post => {
+      if (post) {
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({ message: "post not found" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Cannot retrieve post" });
+    });
+});
+
+// @route    DELETE api/posts
+// @desc     DELETE Single Post
+// @Access   Public
+server.delete("/:id", (req, res) => {
+  Posts.remove(req.params.id)
+    .then(post => {
+      if (post) {
+        getAllItems(req, res);
+      } else {
+        res.status(404).json({ message: "Post not Found" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error deleting Post" });
+    });
+});
+
+// @route    Update api/posts/:id
+// @desc     Update Single Post
+// @Access   Public
+server.put("/:id", (req, res) => {
+  const { errors, isValid } = validatePosts(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
+  Posts.update(req.params.id, req.body)
+    .then(post => {
+      if (post) {
+        getAllItems(req, res);
+      } else {
+        res.status(404).json({ message: "post not found" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "etc ...." });
     });
 });
 
