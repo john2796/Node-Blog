@@ -43,7 +43,7 @@ server.get("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Cannot retrieve User" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 // @route    POST api/users
@@ -59,11 +59,9 @@ server.post("/", upCaseMiddleWare, (req, res) => {
       getAllUser(req, res);
     })
     .catch(err => {
-      res
-        .status(500)
-        .json({
-          message: "Failed to Create a User make sure it's not duplicated"
-        });
+      res.status(500).json({
+        message: "Internal Server Error"
+      });
     });
 });
 // @route    DELETE api/users/:id
@@ -81,7 +79,7 @@ server.delete("/:id", (req, res) => {
       });
     })
     .catch(err => {
-      res.status(500).json({ message: "Error Removing the User" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 // @route    Update api/user
@@ -105,7 +103,7 @@ server.put("/:id", upCaseMiddleWare, (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Cannot update" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 // @route    GET api/posts/:id/messages
@@ -121,7 +119,7 @@ server.get("/:id/messages", (req, res) => {
       }
     })
     .catch(err => {
-      Users.status(500).json({ message: "Error getting posts for the user" });
+      Users.status(500).json({ message: "Internal Server Error" });
     });
 });
 

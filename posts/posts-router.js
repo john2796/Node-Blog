@@ -13,7 +13,7 @@ const getAllItems = (req, res) => {
       res.status(200).json(posts);
     })
     .catch(err => {
-      res.status(500).json({ message: "Error retrieving the posts" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 };
 
@@ -26,7 +26,7 @@ server.get("/query", (req, res) => {
       res.status(200).json(posts);
     })
     .catch(err => {
-      res.status(500).json({ message: "Error retrieving the posts" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 
@@ -56,7 +56,7 @@ server.post("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Error posting " });
+      res.status(500).json({ message: "Internal Server Error " });
     });
 });
 
@@ -73,7 +73,7 @@ server.get("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Cannot retrieve post" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 
@@ -90,7 +90,7 @@ server.delete("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "Error deleting Post" });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 
@@ -112,7 +112,7 @@ server.put("/:id", (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ message: "etc ...." });
+      res.status(500).json({ message: "Internal Server Error" });
     });
 });
 
